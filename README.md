@@ -88,6 +88,8 @@ cd typescript-library-template
 
 Reset the git history and initialize a fresh repository for your project:
 
+**note**: This step is only necessary if you cloned this repository directly. If you used the template, the history is already reset.
+
 ```bash
 rm -rf .git
 git init
@@ -116,6 +118,12 @@ Make sure to update the following files:
     base: '/typescript-library-template-pro/',
   });
   ```
+
+The last step is committing the changes:
+
+```bash
+git commit -am "chore: update project information and configuration"
+```
 
 ### 5. Setup NPM token
 
@@ -149,21 +157,21 @@ To publish your library to NPM, you'll need to set up an NPM token:
 
 ## 📑 Scripts Overview
 
-| Script          | Description                                        |
-| --------------- | -------------------------------------------------- |
-| `dev`           | Starts `tsup` in watch mode for development. Automatically rebuilds on file changes.       |
-| `build`         | Bundles the library for production.                |
-| `format`        | Format the code with Prettier.                     |
-| `typecheck`     | Check types with TypeScript.                       |
-| `lint`          | Lints the codebase with ESLint.                    |
-| `test`          | Run tests with Vitest.                             |
-| `test:watch`    | Run tests in watch mode for development.           |
-| `test:ui`       | Run tests with the Vitest UI.                      |
-| `check-exports` | Check type accuracy for published packages.        |
-| `release`       | Release a new version, updates the changelog, and pushes tags to the repository.                             |
-| `doc:dev`       | Starts a local server for VitePress documentation. |
-| `doc:build`     | Build the documentation for production.            |
-| `doc:preview`   | Preview the built documentation locally.           |
+| Script          | Description                                                                          |
+| --------------- | ------------------------------------------------------------------------------------ |
+| `dev`           | Starts `tsup` in watch mode for development. Automatically rebuilds on file changes. |
+| `build`         | Bundles the library for production.                                                  |
+| `format`        | Format the code with Prettier.                                                       |
+| `typecheck`     | Check types with TypeScript.                                                         |
+| `lint`          | Lints the codebase with ESLint.                                                      |
+| `test`          | Run tests with Vitest.                                                               |
+| `test:watch`    | Run tests in watch mode for development.                                             |
+| `test:ui`       | Run tests with the Vitest UI.                                                        |
+| `check-exports` | Check type accuracy for published packages.                                          |
+| `release`       | Release a new version, updates the changelog, and pushes tags to the repository.     |
+| `doc:dev`       | Starts a local server for VitePress documentation.                                   |
+| `doc:build`     | Build the documentation for production.                                              |
+| `doc:preview`   | Preview the built documentation locally.                                             |
 
 ## 🔄 Development Workflow
 
@@ -264,7 +272,7 @@ This template includes a preconfigured docs folder powered by VitePress. To star
 
      ```bash
       npm install typescript tsc-watch --save-dev
-      ```
+     ```
 
   1. **Update Scripts**: Add the following scripts to the `package.json` file:
 
@@ -281,7 +289,7 @@ This template includes a preconfigured docs folder powered by VitePress. To star
   1. **Test your library**: Create a test file, such as `index.ts`, in the `playground` folderand import your library to run tests:
 
      ```typescript
-     import { add } from 'typescript-library-template-pro'
+     import { add } from "typescript-library-template-pro";
 
      console.log(add(1, 2));
      ```
@@ -305,46 +313,64 @@ This template includes a preconfigured docs folder powered by VitePress. To star
 <details id="how-do-i-adapt-the-library-for-browser-usage">
   <summary><strong>How do I adapt the library for browser usage?</strong></summary>
 
-  > By default, this template is optimized for Node.js, but it can be easily adapted for browser environments. Follow these steps:
+> By default, this template is optimized for Node.js, but it can be easily adapted for browser environments. Follow these steps:
 
-  1. **Update TypeScript Configuration**: Add browser-specific settings to your `tsconfig.json` file by including the `dom` and `dom.iterable` libraries:
+1. **Update TypeScript Configuration**: Add browser-specific settings to your `tsconfig.json` file:
 
-     ```json
-     {
-       "compilerOptions": {
-         ...,
-         "lib": ["es2022", "dom", "dom.iterable"]
-       }
+   ```json
+   {
+     "compilerOptions": {
+       "lib": ["ESNext", "DOM"],
+       "target": "ESNext",
+       "module": "ESNext",
+       "moduleResolution": "node",
+       "outDir": "./dist",
+       "rootDir": "./src",
+       "types": ["node"]
      }
-     ```
+   }
 
-  1. **Configure Testing Environment**: If your library uses browser-specific APIs, set up `jsdom` as your testing environment:
+   ```json
+   {
+      "extends": "personal-style-guide/typescript/browser"
+   }
+   ```
 
-     ```bash
-      npm install jsdom --save-dev
-      ```
+1. **Configure EsLint**: If your library uses browser-specific APIs, update the ESLint configuration to include the browser environment:
 
-      Then, configure Vitest to use `jsdom` in the `vitest.config.ts` file:
+   ```javascript
+   import eslintBrowser from "personal-style-guide/eslint/browser";
 
-      ```typescript
-      import { defineConfig } from "vitest/config";
+   export default [...eslintBrowser];
+   ```
 
-      export default defineConfig({
-        test: {
-          environment: "jsdom",
-          globals: true,
-        },
-      });
-      ```
+1. **Configure Testing Environment**: If your library uses browser-specific APIs, set up `jsdom` as your testing environment:
 
-  1. **Test in Browser Environment**: You can now test your library in a browser environment. For example, you can test the `localStorage` API:
+   ```bash
+    npm install jsdom --save-dev
+   ```
 
-      ```typescript
-      test("localStorage works in browser environment", () => {
-        localStorage.setItem("key", "value");
-        expect(localStorage.getItem("key")).toBe("value");
-      });
-      ```
+   Then, configure Vitest to use `jsdom` in the `vitest.config.ts` file:
+
+   ```typescript
+   import { defineConfig } from "vitest/config";
+
+   export default defineConfig({
+     test: {
+       environment: "jsdom",
+       globals: true,
+     },
+   });
+   ```
+
+1. **Test in Browser Environment**: You can now test your library in a browser environment. For example, you can test the `localStorage` API:
+
+   ```typescript
+   test("localStorage works in browser environment", () => {
+     localStorage.setItem("key", "value");
+     expect(localStorage.getItem("key")).toBe("value");
+   });
+   ```
 
 </details>
 
@@ -403,7 +429,7 @@ Contributions are welcome! Please follow these steps:
 1. Fork the repository.
 1. Create a new branch (git checkout -b feature/my-feature).
 1. Make your changes and write tests.
-1. Commit your changes using a [conventional commit message]((https://gist.github.com/fvena/9e42792ad951b47ad143ba7e4bfedb5a)).
+1. Commit your changes using a [conventional commit message](<(https://gist.github.com/fvena/9e42792ad951b47ad143ba7e4bfedb5a)>).
 1. Push your branch and open a Pull Request.
 
 ## 📜 License

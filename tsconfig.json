@@ -1,33 +1,4 @@
 {
-  /*
-   * This configuration is based on "The TSConfig Cheat Sheet" by Matt Pocock.
-   * See: https://www.totaltypescript.com/tsconfig-cheat-sheet
-   */
-  "compilerOptions": {
-    /* Base Options: */
-    "esModuleInterop": true, // Helps mend a few of the fences between CommonJS and ES Modules.
-    "skipLibCheck": true, // Skips checking the types of .d.ts files. This is important for performance, because otherwise all node_modules will be checked.
-    "target": "es2022", // The version of JavaScript you're targeting. I recommend es2022 over esnext for stability.
-    "allowJs": true, // Allows JavaScript files to be included in the project.
-    "resolveJsonModule": true, // Allows importing JSON files.
-    "moduleDetection": "force", // This option forces TypeScript to consider all files as modules. This helps to avoid 'cannot redeclare block-scoped variable' errors.
-    "isolatedModules": true, // This option prevents a few TS features which are unsafe when treating modules as isolated files.
-    "verbatimModuleSyntax": true, // This option forces you to use import type and export type, leading to more predictable behavior and fewer unnecessary imports.
-
-    /* Strictness */
-    "strict": true, // Enables all strict type checking options. Indispensable.
-    "noUncheckedIndexedAccess": true, // Prevents you from accessing an array or object without first checking if it's defined. This is a great way to prevent runtime errors.
-    "noImplicitOverride": true, // Prevents you from accidentally overriding a method without the override keyword.
-
-    /* If NOT transpiling with TypeScript: */
-    "module": "preserve", // This option preserves the module structure of your code. This is useful if you're not transpiling with TypeScript.
-    "noEmit": true, // Tells TypeScript not to emit any files. This is important when you're using a bundler so you don't emit useless .js files.
-
-    /* If your code doesn't run in the DOM: */
-    "lib": ["es2022"] // Tells TypeScript what built-in types to include. es2022 is the best option for stability.
-
-    /* If your code runs in the DOM: */
-    // "lib": ["es2022", "dom", "dom.iterable"] // Tells TypeScript what built-in types to include. es2022 is the best option for stability. dom and dom.iterable give you types for window, document etc.
-  },
+  "extends": "personal-style-guide/typescript/node",
   "include": ["src", "test", "docs/.vitepress/**/*", "*.config.*"]
 }

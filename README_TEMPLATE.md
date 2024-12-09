@@ -95,7 +95,7 @@ Indicate if your library requires any prerequisites before it can be used, such 
 
 ```sh
 npm install npm@latest -g
-````
+```
 
 ### Installation
 
@@ -117,10 +117,10 @@ Refer to the documentation for more examples.
 
 ### Scripts Overview
 
-| Script          | Description                                        |
-| --------------- | -------------------------------------------------- |
-| `build`         | Builds the library.                                |
-| `test`          | Runs the tests.                                    |
+| Script  | Description         |
+| ------- | ------------------- |
+| `build` | Builds the library. |
+| `test`  | Runs the tests.     |
 
 ## 🗺️ Roadmap
 
