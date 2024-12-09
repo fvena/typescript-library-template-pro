@@ -24,6 +24,10 @@
     "lint": "eslint .",
     "prepare": "husky"
   },
+  "lint-staged": {
+    "*": "prettier -w --ignore-unknown",
+    "*.{js,ts}": "eslint --fix"
+  },
   "keywords": [
     "typescript",
     "starter",
@@ -57,6 +61,7 @@
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-unicorn": "^56.0.1",
     "globals": "^15.13.0",
+    "lint-staged": "^15.2.10",
     "prettier": "^3.4.2",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
