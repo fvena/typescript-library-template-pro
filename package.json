@@ -20,7 +20,8 @@
     "dev": "tsup --watch",
     "build": "tsup",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   },
   "keywords": [
     "typescript",
@@ -42,8 +43,20 @@
     "node": ">=22.11.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.7.0",
+    "eslint-plugin-import-x": "^4.5.0",
+    "eslint-plugin-n": "^17.14.0",
+    "eslint-plugin-perfectionist": "^4.2.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-unicorn": "^56.0.1",
+    "globals": "^15.13.0",
     "prettier": "^3.4.2",
     "tsup": "^8.3.5",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.17.0"
   }
 }
