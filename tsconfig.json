@@ -28,5 +28,6 @@
 
     /* If your code runs in the DOM: */
     // "lib": ["es2022", "dom", "dom.iterable"] // Tells TypeScript what built-in types to include. es2022 is the best option for stability. dom and dom.iterable give you types for window, document etc.
-  }
+  },
+  "include": ["src", "test", "docs/.vitepress/**/*", "*.config.*"]
 }
