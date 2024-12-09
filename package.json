@@ -1,0 +1,46 @@
+{
+  "name": "typescript-library-template-pro",
+  "version": "0.1.0",
+  "description": "A simple, professional, and modern template for building and maintaining TypeScript libraries. This template integrates the best tools, workflows, and practices to help you focus on developing your library without worrying about setup.",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup"
+  },
+  "keywords": [
+    "typescript",
+    "starter",
+    "library",
+    "template"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/fvena/typescript-library-template-pro#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fvena/typescript-library-template-pro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fvena/typescript-library-template-pro/issues"
+  },
+  "author": "Francisco Vena <fvena32@gmail.com> (https://www.fvena.com)",
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
+}
