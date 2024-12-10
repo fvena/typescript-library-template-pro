@@ -22,29 +22,28 @@
   <summary><strong>Table of Contents</strong></summary>
   <ol>
     <li>
-      <a href="#💡-motivation">💡 Motivation</a>
+      <a href="#-motivation">💡 Motivation</a>
     </li>
-    <li><a href="#🚀-features">🚀 Features</a></li>
+    <li><a href="#-features">🚀 Features</a></li>
     <li>
-      <a href="#📦-getting-started">📦 Getting Started</a>
+      <a href="#-getting-started">📦 Getting Started</a>
     </li>
-    <li><a href="#📑-scripts-overview">📑 Scripts Overview</a></li>
-    <li><a href="#🔄-development-workflow">🔄 Development Workflow</a></li>
-    <li><a href="#📦-releasing-a-version">📦 Releasing a Version</a></li>
-    <li><a href="#📖-documentation">📖 Documentation</a></li>
+    <li><a href="#-scripts-overview">📑 Scripts Overview</a></li>
+    <li><a href="#-development-workflow">🔄 Development Workflow</a></li>
+    <li><a href="#-releasing-a-version">📦 Releasing a Version</a></li>
+    <li><a href="#-documentation">📖 Documentation</a></li>
+    <li><a href="#-check-your-library">🧪 Check your library</a></li>
     <li>
-      <a href="#🧩-faqs">🧩 FAQs</a>
+      <a href="#-faqs">🧩 FAQs</a>
       <ul>
         <li><a href="#errors-when-publishing-the-package-to-npm">Errors when publishing the package to npm</a></li>
-        <li><a href="#how-do-i-check-my-library-in-a-separate-project">How do I check my library in a separate project?</a></li>
-        <li><a href="#how-do-i-check-my-library-within-the-same-repository">How do I check my library within the same repository?</a></li>
         <li><a href="#how-do-i-adapt-the-library-for-browser-usage">How do I adapt the library for browser usage?</a></li>
         <li><a href="#how-do-i-add-test-coverage">How do I add test coverage?</a></li>
         <li><a href="#how-do-i-disable-documentation">How do I disable documentation?</a></li>
         <li><a href="#how-can-i-set-up-github-issue-templates">How can I set up GitHub issue templates?</a></li>
       </ul>
     </li>
-    <li><a href="#🤝-contributing">🤝 Contributing</a></li>
+    <li><a href="#-contributing">🤝 Contributing</a></li>
   </ol>
 </details>
 
@@ -209,25 +208,15 @@ This template includes a preconfigured docs folder powered by VitePress. To star
    npm run docs:dev
    ```
 
-## 🧩 FAQs
+## 🧪 Check your library
 
-<details id="errors-when-publishing-the-package-to-npm">
-  <summary><strong>Errors when publishing the package to npm</strong></summary>
-
-- `npm ERR! code E403`: This error occurs when your email is not verified in npm or if the package name is already taken.
-
-- `npm error code ENEEDAUTH`: This error occurs when the npm token is not set up correctly.
-
-</details>
-
-<details id="how-do-i-check-my-library-in-a-separate-project">
-  <summary><strong>How do I check my library in a separate project?</strong></summary>
+### How do I check my library in a separate project?
 
 > This method is ideal for testing your library in a completely separate project environment.
 
 - Link your library to the global npm environment:
 
-  1. Run `npm link` command in your library's root directory.
+  1. Run `npm link` in your library's root directory.
   1. In the project where you want to use your library, run `npm link <your-library-name>`
 
 - Unlink your library (optional):
@@ -237,44 +226,102 @@ This template includes a preconfigured docs folder powered by VitePress. To star
 
 - For more details, refer to the [npm link documentation](https://docs.npmjs.com/cli/v7/commands/npm-link).
 
-</details>
-
-<details id="how-do-i-check-my-library-within-the-same-repository">
-  <summary><strong>How do I check my library within the same repository?</strong></summary>
+### How do I check my library within the same repository?
 
 > This approach is useful for quickly testing your library without setting up a separate project.
 
-- If you'd like to test your library directly within the same project, you can set up a local testing environment. Follow these steps:
+If you'd like to test your library directly within the same project, the best approach is to create a playground environment where you can link your library as a dependency. This allows you to test your library as if it were a published package.
 
-  1. **Create a testing environment**: Inside your project root, create a playground folder for writing test code:
+### Generic Steps to Test a Library
+
+1. **Create a testing environment**: Set up a playground folder in your project root (e.g., playground, examples, or similar).
+
+1. **Configure the Testing Environment**: Depending on your library, set up the appropriate tooling in the playground (Vite, Vue, Vanilla, ...).
+
+1. **Set the module type**: Update the `playground/package.json` to use ESM modules:
+
+    ```json
+    {
+    "type": "module",
+    }
+    ```
+
+1. **Add the playground as a workspace**: You need install all dependencies with the `npm install` command in the root folder, to pass the CI/CD pipeline.
+
+    ```json
+    {
+      "workspaces": ["playground"]
+    }
+    ```
+
+    **Important**: You need to build the library before running the linting and testing scripts. Update the `ci.yml` file to include the build step before running the tests:
+
+    ```yaml
+    - run: npm ci --ignore-scripts
+    - run: npm run build
+    - run: npm run lint
+    - run: npm run typecheck
+    ```
+
+1. **Link the Library**: Add your library as a dependency in the `playground/package.json`. For example:
+
+    ```json
+    {
+      "dependencies": {
+        "typescript-library-template-pro": "file:../"
+      }
+    }
+    ```
+
+    **Important**: After editing the package.json, install the dependencies:
+
+    ```bash
+    npm install
+    ```
+
+### Example for a Vanilla TypeScript Library
+
+This example demonstrates how to set up a playground to test a TypeScript library. Follow these steps:
+
+  1. **Create a Playground Folder**
 
      ```bash
      mkdir playground
-     ```
-
-  1. **Initialize a local NPM project**: Navigate to the `playground` folder and set up an npm environment:
-
-     ```bash
      cd playground
      npm init -y
      ```
 
-  1. **Set the module type**: Update the `package.json` in `playground`folder to use ESM modules:
+  1. **Set the module type**: Update the `playground/package.json` to use ESM modules:
 
      ```json
      {
-      ...
       "type": "module",
      }
      ```
 
-  1. **Install TypeScript and Watcher**: Install TypeScript and `tsc-watch` as development dependencies to compile TypeScript files:
+  1. **Link the Library**: Add your library as a dependency.
+
+     ```json
+     {
+      "dependencies": {
+        "typescript-library-template-pro": "file:../"
+      }
+     }
+     ```
+
+     Then, install the dependencies:
+
+      ```bash
+      npm install
+      ```
+
+  1. **Install TypeScript and Watcher**
 
      ```bash
       npm install typescript tsc-watch --save-dev
      ```
 
-  1. **Update Scripts**: Add the following scripts to the `package.json` file:
+  1. **Update Scripts**: Add the following scripts to the `playground/package.json` file:
 
      ```json
      {
@@ -286,27 +333,65 @@ This template includes a preconfigured docs folder powered by VitePress. To star
      }
      ```
 
-  1. **Test your library**: Create a test file, such as `index.ts`, in the `playground` folderand import your library to run tests:
+  1. **Test your library**: Add a file, `index.ts`, in the `playground` folder:
 
      ```typescript
      import { add } from "typescript-library-template-pro";
 
      console.log(add(1, 2));
-     ```
 
-  1. **Add a Eslint Configuration**: If you want to lint the playground code, create an `eslint.config.js` file in the `playground` directory and extend the library's configuration:
-
-     ```typescript
-     import config from "../../eslint.config.js";
-
-     export default [...config];
-     ```
-
-  1. **Run the Playground**: Start the TypeScript watcher to compile the code and run the test file:
+  1. **Run both projects**: Run the library and the playground in separate terminals in watch mode:
 
      ```bash
       npm run dev
      ```
+
+### Example for a Browser Library
+
+This example demonstrates how to set up a playground to test a library that works in a browser environment. Follow these steps:
+
+1. **Create a Playground Using Vite**: Use the Vite assistant to scaffold a new project. In the root folder, run:
+
+   ```bash
+   npm create vite@latest playground
+   ```
+
+1. **Link the Library**: Add your library as a dependency in the `playground/package.json`:
+
+   ```json
+   {
+     "dependencies": {
+       "typescript-library-template-pro": "file:../"
+     }
+   }
+   ```
+
+   Then, install the dependencies:
+
+   ```bash
+    npm install
+    ```
+
+1. **Test your library**: Add library imports to the playground code, where you can test it:
+
+   ```typescript
+   import { add } from "typescript-library-template-pro";
+   ```
+
+1. **Run both projects**: Run the library and the playground in separate terminals in watch mode:
+
+     ```bash
+      npm run dev
+     ```
+
+## 🧩 FAQs
+
+<details id="errors-when-publishing-the-package-to-npm">
+  <summary><strong>Errors when publishing the package to npm</strong></summary>
+
+- `npm ERR! code E403`: This error occurs when your email is not verified in npm or if the package name is already taken.
+
+- `npm error code ENEEDAUTH`: This error occurs when the npm token is not set up correctly.
 
 </details>
 
