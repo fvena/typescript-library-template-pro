@@ -1,4 +1,5 @@
-<br />
+<br /><!-- markdownlint-disable-line -->
+
 <p align="right">
   ⭐ &nbsp;&nbsp;<strong>to the project if you like it</strong> ↗️:
 </p>
@@ -13,8 +14,12 @@
 
 <div align="center">
 
+<!-- markdownlint-disable MD042 -->
+
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/fvena/typescript-library-template-pro)
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
+
+<!-- markdownlint-enable MD042 -->
 
 </div>
 
@@ -124,11 +129,32 @@ The last step is committing the changes:
 git commit -am "chore: update project information and configuration"
 ```
 
-### 5. Setup NPM token
+### 5. Get your GitHub personal access token if you don't have one
 
-To publish your library to NPM, you'll need to set up an NPM token:
+> You don't need to do this every time you create a new repository, only the first time. But you need save the token in a secure place, to use it in the next repositories.
 
-#### Get your NPM token
+1. Go to your GitHub account settings
+1. Click on `Developer settings` > `Personal access tokens` > `Fine-grained tokens`
+1. Click on `Generate new token (classic)`
+1. Set the token name (ex: semantic-release)
+1. Select the expiration date (no expiration date is recommended for personal projects)
+1. In Repository access select `All repositories`
+1. In Permissions select:
+
+   - Commit statuses -> `Read & write`
+   - Contents -> `Read & write`
+   - Environments -> `Read-only`
+   - Issues -> `Read & write`
+   - Metadata -> `Read-only`
+   - Pull requests -> `Read & write`
+   - Secrets -> `Read-only`
+   - Variables -> `Read-only`
+   - Workflows -> `Read & write`
+
+1. Click on `Generate token`
+1. Copy the generated token and save it in a secure place. You won't be able to see it again.
+
+### 6. Get your NPM token
 
 1. Go to the [npm website](https://www.npmjs.com)
 1. Log in to your account
@@ -138,16 +164,18 @@ To publish your library to NPM, you'll need to set up an NPM token:
 1. Select `Automation` type and click on `Generate Token`
 1. Copy the generated token
 
-#### Add the NPM token to the GitHub repository secrets
+### 7. Add tokens to the GitHub repository secrets
+
+To enable the CI/CD pipeline and publish your library to NPM, you'll need to set up a GitHub and NPM token:
 
 1. Go to your GitHub repository
 1. Click on `Settings` tab
 1. Click on `Secrets and variables` > `Actions` in the left sidebar
 1. Click on `New repository secret`
-1. Use the `NPM_TOKEN` as the secret name and paste the token value
+1. Use the `GH_TOKEN` and `NPM_TOKEN` as the secret name and paste the token value
 1. Click on `Add secret`
 
-### 6. Setup GitHub Pages for documentation
+### 8. Setup GitHub Pages for documentation
 
 1. Go to your GitHub repository
 1. Click on `Settings` tab
@@ -156,53 +184,94 @@ To publish your library to NPM, you'll need to set up an NPM token:
 
 ## 📑 Scripts Overview
 
-| Script          | Description                                                                          |
-| --------------- | ------------------------------------------------------------------------------------ |
-| `dev`           | Starts `tsup` in watch mode for development. Automatically rebuilds on file changes. |
-| `build`         | Bundles the library for production.                                                  |
-| `format`        | Format the code with Prettier.                                                       |
-| `typecheck`     | Check types with TypeScript.                                                         |
-| `lint`          | Lints the codebase with ESLint.                                                      |
-| `test`          | Run tests with Vitest.                                                               |
-| `test:watch`    | Run tests in watch mode for development.                                             |
-| `test:ui`       | Run tests with the Vitest UI.                                                        |
-| `check-exports` | Check type accuracy for published packages.                                          |
-| `release`       | Release a new version, updates the changelog, and pushes tags to the repository.     |
-| `doc:dev`       | Starts a local server for VitePress documentation.                                   |
-| `doc:build`     | Build the documentation for production.                                              |
-| `doc:preview`   | Preview the built documentation locally.                                             |
+| Script             | Description                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| `dev`              | Starts `tsup` in watch mode for development. Automatically rebuilds on file changes. |
+| `build`            | Bundles the library for production.                                                  |
+| `format`           | Format the code with Prettier.                                                       |
+| `typecheck`        | Check types with TypeScript.                                                         |
+| `lint`             | Lints the codebase with ESLint.                                                      |
+| `test`             | Run tests with Vitest.                                                               |
+| `test:watch`       | Run tests in watch mode for development.                                             |
+| `test:ui`          | Run tests with the Vitest UI.                                                        |
+| `check-exports`    | Check type accuracy for published packages.                                          |
+| `semantic-release` | Release a new version, updates the changelog, and pushes tags to the repository.     |
+| `doc:dev`          | Starts a local server for VitePress documentation.                                   |
+| `doc:build`        | Build the documentation for production.                                              |
+| `doc:preview`      | Preview the built documentation locally.                                             |
 
 ## 🔄 Development Workflow
 
-This template is set up with a single branch workflow. This means that you will make changes directly in the `main` branch. This approach works best for small projects and solo developers:
+This template now supports a dual workflow setup, allowing flexibility depending on the project size and team structure. Choose between a simple `develop` workflow or a task-based workflow with feature branches:
 
-1. Make changes directly in the `main` branch.
-1. Use [conventional commit messages](https://gist.github.com/fvena/9e42792ad951b47ad143ba7e4bfedb5a).
+### Option 1: Simple `develop` Workflow
+
+Best for solo developers or small projects.
+
+1. Work directly in the `develop` branch.
 1. Push changes to trigger the CI pipeline for linting and testing.
+1. When ready to release:
+   - Open a Pull Request from `develop` to `main`.
+   - Merge the PR to trigger the release and deploy workflows.
 
-For larger projects or teams, consider adopting a feature-branch workflow with pull requests for better collaboration.
+### Option 2: Feature Branch Workflow
+
+Recommended for larger projects or teams to improve collaboration.
+
+1. Create branches for tasks using descriptive prefixes such as:
+   - `feature/` for new features (e.g., `feature/add-login-page`).
+   - `fix/` for bug fixes (e.g., `fix/header-alignment`).
+   - `chore/` for maintenance tasks (e.g., `chore/update-dependencies`).
+   - `docs/` for documentation updates (e.g., `docs/update-readme`).
+   - 'refactor/' for code refactoring (e.g., 'refactor/update-logic').
+   - 'test/' for test updates (e.g., 'test/update-unit-tests').
+1. Work on your changes in the corresponding branch.
+1. Open a Pull Request from the task branch to `develop`.
+1. Once the PR is approved and merged, repeat steps 1–3 for additional tasks.
+1. When ready to release:
+   - Open a Pull Request from `develop` to `main`.
+   - Merge the PR to trigger the release and deploy workflows.
+
+### Best Practices: Protect the `main` Branch
+
+To ensure stability and maintain the integrity of the `main` branch, follow these steps:
+
+1. Go to **Settings > Branches > Branch protection rules** in your repository.
+1. Click on `Add classic branch protection rule`.
+1. Set the branch name pattern to `main`.
+
+   - Enable **Require a pull request before merging** - this ensures that all changes are reviewed.
+   - Disable **Require approvals** - this is optional, depending on your team's workflow.
+   - Enable **Require status checks to pass before merging** - this ensures that all workflows pass.
+   - Enable **Require branches to be up to date before merging** - this ensures that the branch is up to date.
+   - Enable **Require linear history** - this ensures that the branch history is linear.
+   - Enable **Do not allow bypassing the above settings** - this ensures that even admins follow the rules.
+
+1. Click on `Create` to save the changes.
+
+With these rules in place:
+
+- The `main` branch will only accept changes via Pull Requests that pass all workflows.
+- Developers cannot push directly to `main`, reducing the risk of accidental changes.
 
 ## 📦 Releasing a Version
 
-1. Run the release script locally to bump the version and generate a changelog. The release script will:
+Releases are automated using `semantic-release` and are triggered when a Pull Request is merged into the `main` branch. Here's what happens during a release:
 
-   - Uses commit messages to determine the semantic version bump.
-   - Generate a changelog.
-   - Create a new git tag.
-   - Pushes changes and tags to the remote repository.
-
-   ```bash
-   npm run release
-   ```
-
-1. The CI/CD pipeline will publish the new version to NPM and deploy updated documentation to GitHub Pages.
+1. **Commit Analysis:** Uses commit messages to determine the next semantic version (major, minor, or patch) based on the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+1. **Release Notes Generation:** Automatically generates release notes using the commit messages.
+1. **Changelog Update:** Appends the new release information to the `CHANGELOG.md` file.
+1. **Version Bump:** Updates the version in `package.json` and creates a new Git tag for the release.
+1. **Publish to NPM:** Publishes the updated package to the NPM registry.
+1. **Commit Changes:** Commits the updated `CHANGELOG.md` and `package.json` back to the repository
+1. **Create GitHub Release:** Creates a release on GitHub with the release notes and associated artifacts.
 
 ## 📖 Documentation
 
 This template includes a preconfigured docs folder powered by VitePress. To start writing documentation:
 
 1. Edit or add markdown files in the docs folder.
-2. Start a local preview with:
+1. Start a local preview with:
 
    ```bash
    npm run docs:dev
@@ -240,111 +309,112 @@ If you'd like to test your library directly within the same project, the best ap
 
 1. **Set the module type**: Update the `playground/package.json` to use ESM modules:
 
-    ```json
-    {
-    "type": "module",
-    }
-    ```
+   ```json
+   {
+     "type": "module"
+   }
+   ```
 
 1. **Add the playground as a workspace**: You need install all dependencies with the `npm install` command in the root folder, to pass the CI/CD pipeline.
 
-    ```json
-    {
-      "workspaces": ["playground"]
-    }
-    ```
+   ```json
+   {
+     "workspaces": ["playground"]
+   }
+   ```
 
-    **Important**: You need to build the library before running the linting and testing scripts. Update the `ci.yml` file to include the build step before running the tests:
+   **Important**: You need to build the library before running the linting and testing scripts. Update the `ci.yml` file to include the build step before running the tests:
 
-    ```yaml
-    - run: npm ci --ignore-scripts
-    - run: npm run build
-    - run: npm run lint
-    - run: npm run typecheck
-    ```
+   ```yaml
+   - run: npm ci --ignore-scripts
+   - run: npm run build
+   - run: npm run lint
+   - run: npm run typecheck
+   ```
 
 1. **Link the Library**: Add your library as a dependency in the `playground/package.json`. For example:
 
-    ```json
-    {
-      "dependencies": {
-        "typescript-library-template-pro": "file:../"
-      }
-    }
-    ```
+   ```json
+   {
+     "dependencies": {
+       "typescript-library-template-pro": "file:../"
+     }
+   }
+   ```
 
-    **Important**: After editing the package.json, install the dependencies:
+   **Important**: After editing the package.json, install the dependencies:
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
 ### Example for a Vanilla TypeScript Library
 
 This example demonstrates how to set up a playground to test a TypeScript library. Follow these steps:
 
-  1. **Create a Playground Folder**
+1. **Create a Playground Folder**
 
-     ```bash
-     mkdir playground
-     cd playground
-     npm init -y
-     ```
+   ```bash
+   mkdir playground
+   cd playground
+   npm init -y
+   ```
 
-  1. **Set the module type**: Update the `playground/package.json` to use ESM modules:
+1. **Set the module type**: Update the `playground/package.json` to use ESM modules:
 
-     ```json
-     {
-      "type": "module",
+   ```json
+   {
+     "type": "module"
+   }
+   ```
+
+1. **Link the Library**: Add your library as a dependency.
+
+   ```json
+   {
+     "dependencies": {
+       "typescript-library-template-pro": "file:../"
      }
-     ```
+   }
+   ```
 
-  1. **Link the Library**: Add your library as a dependency.
+   Then, install the dependencies:
 
-     ```json
-     {
-      "dependencies": {
-        "typescript-library-template-pro": "file:../"
-      }
-     }
-     ```
+   ```bash
+   npm install
+   ```
 
-     Then, install the dependencies:
+1. **Install TypeScript and Watcher**
 
-      ```bash
-      npm install
-      ```
+   ```bash
+    npm install typescript tsc-watch --save-dev
+   ```
 
-  1. **Install TypeScript and Watcher**
+1. **Update Scripts**: Add the following scripts to the `playground/package.json` file:
 
-     ```bash
-      npm install typescript tsc-watch --save-dev
-     ```
+   ```json
+   {
+    ...
+    "scripts": {
+      "dev": "tsc-watch --noClear --onSuccess \"node ./dist/index.js\"",
+      "build": "tsc"
+    },
+   }
+   ```
 
-  1. **Update Scripts**: Add the following scripts to the `playground/package.json` file:
+1. **Test your library**: Add a file, `index.ts`, in the `playground` folder:
 
-     ```json
-     {
-      ...
-      "scripts": {
-        "dev": "tsc-watch --noClear --onSuccess \"node ./dist/index.js\"",
-        "build": "tsc"
-      },
-     }
-     ```
+   ```typescript
+   import { add } from "typescript-library-template-pro";
 
-  1. **Test your library**: Add a file, `index.ts`, in the `playground` folder:
+   console.log(add(1, 2));
+   ```
 
-     ```typescript
-     import { add } from "typescript-library-template-pro";
+1. **Run both projects**: Run the library and the playground in separate terminals in watch mode:
 
-     console.log(add(1, 2));
-
-  1. **Run both projects**: Run the library and the playground in separate terminals in watch mode:
-
-     ```bash
-      npm run dev
-     ```
+   ```bash
+    npm run dev
+   ```
 
 ### Example for a Browser Library
 
@@ -370,7 +440,7 @@ This example demonstrates how to set up a playground to test a library that work
 
    ```bash
     npm install
-    ```
+   ```
 
 1. **Test your library**: Add library imports to the playground code, where you can test it:
 
@@ -380,9 +450,9 @@ This example demonstrates how to set up a playground to test a library that work
 
 1. **Run both projects**: Run the library and the playground in separate terminals in watch mode:
 
-     ```bash
-      npm run dev
-     ```
+   ```bash
+    npm run dev
+   ```
 
 ## 🧩 FAQs
 
@@ -395,6 +465,25 @@ This example demonstrates how to set up a playground to test a library that work
 
 </details>
 
+<details id="updating-dependencies">
+  <summary><strong>How do I update dependencies?</strong></summary>
+
+- To update dependencies, run the following command:
+
+  ```bash
+  npx npm-check-updates  --interactive --format group
+  ```
+
+  This will display a summary of packages that can be updated along with their current and latest versions. For more control, use the interactive mode to review and update dependencies one by one.
+
+  - After updating the dependencies, commit the changes:
+
+  ```
+  git commit -m 'chore(dependencies): update dependencies to latest versions'
+  ```
+
+</details>
+
 <details id="how-do-i-adapt-the-library-for-browser-usage">
   <summary><strong>How do I adapt the library for browser usage?</strong></summary>
 
@@ -402,7 +491,7 @@ This example demonstrates how to set up a playground to test a library that work
 
 1. **Update TypeScript Configuration**: Add browser-specific settings to your `tsconfig.json` file:
 
-   ```json
+   ````json
    {
      "compilerOptions": {
        "lib": ["ESNext", "DOM"],
@@ -419,7 +508,7 @@ This example demonstrates how to set up a playground to test a library that work
    {
       "extends": "personal-style-guide/typescript/browser"
    }
-   ```
+   ````
 
 1. **Configure EsLint**: If your library uses browser-specific APIs, update the ESLint configuration to include the browser environment:
 
@@ -487,7 +576,7 @@ This example demonstrates how to set up a playground to test a library that work
 
   1. Remove the `docs` folder and related `docs:*` scripts from `package.json`.
   1. Remove `vitepress` from the `devDependencies`.
-  1. Delete the `buildDocs` and `deployDocs` jobs from the `.github/workflows/ci.yml` file.
+  1. Delete the `.github/workflowsdeploy.yml` workflow.
 
 </details>
 
