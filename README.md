@@ -107,7 +107,15 @@ git init
 npm install
 ```
 
-### 4. Update Project Information
+### 4. Create a new branch develop
+
+I recommend creating a new branch to start your development:
+
+```bash
+git checkout -b develop
+```
+
+### 5. Update Project Information
 
 Make sure to update the following files:
 
@@ -129,7 +137,7 @@ The last step is committing the changes:
 git commit -am "chore: update project information and configuration"
 ```
 
-### 5. Get your GitHub personal access token if you don't have one
+### 6. Get your GitHub personal access token if you don't have one
 
 > You don't need to do this every time you create a new repository, only the first time. But you need save the token in a secure place, to use it in the next repositories.
 
@@ -154,7 +162,7 @@ git commit -am "chore: update project information and configuration"
 1. Click on `Generate token`
 1. Copy the generated token and save it in a secure place. You won't be able to see it again.
 
-### 6. Get your NPM token
+### 7. Get your NPM token
 
 1. Go to the [npm website](https://www.npmjs.com)
 1. Log in to your account
@@ -164,7 +172,7 @@ git commit -am "chore: update project information and configuration"
 1. Select `Automation` type and click on `Generate Token`
 1. Copy the generated token
 
-### 7. Add tokens to the GitHub repository secrets
+### 8. Add tokens to the GitHub repository secrets
 
 To enable the CI/CD pipeline and publish your library to NPM, you'll need to set up a GitHub and NPM token:
 
@@ -175,7 +183,7 @@ To enable the CI/CD pipeline and publish your library to NPM, you'll need to set
 1. Use the `GH_TOKEN` and `NPM_TOKEN` as the secret name and paste the token value
 1. Click on `Add secret`
 
-### 8. Setup GitHub Pages for documentation
+### 9. Setup GitHub Pages for documentation
 
 1. Go to your GitHub repository
 1. Click on `Settings` tab
@@ -184,21 +192,23 @@ To enable the CI/CD pipeline and publish your library to NPM, you'll need to set
 
 ## 📑 Scripts Overview
 
-| Script             | Description                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------ |
+<!-- prettier-ignore -->
+| Script             | Description                                                                 |
+| ------------------ | --------------------------------------------------------------------------- |
 | `dev`              | Starts `tsup` in watch mode for development. Automatically rebuilds on file changes. |
-| `build`            | Bundles the library for production.                                                  |
-| `format`           | Format the code with Prettier.                                                       |
-| `typecheck`        | Check types with TypeScript.                                                         |
-| `lint`             | Lints the codebase with ESLint.                                                      |
-| `test`             | Run tests with Vitest.                                                               |
-| `test:watch`       | Run tests in watch mode for development.                                             |
-| `test:ui`          | Run tests with the Vitest UI.                                                        |
-| `check-exports`    | Check type accuracy for published packages.                                          |
-| `semantic-release` | Release a new version, updates the changelog, and pushes tags to the repository.     |
-| `doc:dev`          | Starts a local server for VitePress documentation.                                   |
-| `doc:build`        | Build the documentation for production.                                              |
-| `doc:preview`      | Preview the built documentation locally.                                             |
+| `build`            | Bundles the library for production.                                         |
+| `format`           | Format the code with Prettier.                                              |
+| `typecheck`        | Check types with TypeScript.                                                |
+| `lint`             | Lints the codebase with ESLint.                                             |
+| `test`             | Run tests with Vitest.                                                      |
+| `test:watch`       | Run tests in watch mode for development.                                    |
+| `test:ui`          | Run tests with the Vitest UI.                                               |
+| `test:coverage`    | Run tests with coverage reports.                                            |
+| `check-exports`    | Check type accuracy for published packages.                                 |
+| `semantic-release` | Release a new version, updates the changelog, and pushes tags to the repository. |
+| `doc:dev`          | Starts a local server for VitePress documentation.                          |
+| `doc:build`        | Build the documentation for production.                                     |
+| `doc:preview`      | Preview the built documentation locally.                                    |
 
 ## 🔄 Development Workflow
 
@@ -544,27 +554,6 @@ This example demonstrates how to set up a playground to test a library that work
      localStorage.setItem("key", "value");
      expect(localStorage.getItem("key")).toBe("value");
    });
-   ```
-
-</details>
-
-<details id="how-do-i-add-test-coverage">
-  <summary><strong>How do I add test coverage?</strong></summary>
-
-1. **Install `c8`**: Vitest uses c8 to generate coverage reports. Install it as a development dependency:
-
-   ```bash
-   npm i -D @vitest/coverage-v8
-   ```
-
-1. **Run Tests with Coverage**: To generate coverage reports, use the --coverage flag when running Vitest. Add the following script to your `package.json`:
-
-   ```json
-   {
-     "scripts": {
-       "test:coverage": "vitest run --coverage"
-     }
-   }
    ```
 
 </details>

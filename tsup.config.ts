@@ -1,5 +1,4 @@
 import type { Options } from "tsup";
-
 import { defineConfig } from "tsup";
 
 const config: Options = {
