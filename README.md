@@ -18,6 +18,7 @@
 
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/fvena/typescript-library-template-pro)
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
+[![Build Status](https://github.com/fvena/typescript-library-template-pro/workflows/CI%2FCD/badge.svg)]()
 
 <!-- markdownlint-enable MD042 -->
 
@@ -99,12 +100,15 @@ rm -rf .git
 git init
 ```
 
-### 3. Install dependencies
+### 3. Remove `package-lock.json` and update packages
 
-**Important**: install the dependencies after updating the repository.
+Update the packages to the latest versions and remove the `package-lock.json` file:
 
 ```bash
-npm install
+rm package-lock.json
+
+npx npm-check-updates --interactive --format group
+npm install // only if you have not updated the dependencies
 ```
 
 ### 4. Create a new branch develop
