@@ -125,7 +125,7 @@ Make sure to update the following files:
 
 - `package.json`: Update `name`, `version`, `description`, `author`, `repository`and other relevant fields.
 - `LICENSE`: Update the copyright year and author information.
-- `README.md`: Replace this file with `README_TEMPLATE.md` and update the content.
+- `README.md`: Replace this file with this [`README_TEMPLATE.md`](https://gist.github.com/fvena/b53eed2c878f16d3d589f85b10ab3e5c) and update the content.
 - `docs/.vitepress/config.ts`: update the base option in the VitePress configuration file with your repository name:
 
   ```typescript
