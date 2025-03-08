@@ -111,15 +111,7 @@ npx npm-check-updates --interactive --format group
 npm install // only if you have not updated the dependencies
 ```
 
-### 4. Create a new branch develop
-
-I recommend creating a new branch to start your development:
-
-```bash
-git checkout -b develop
-```
-
-### 5. Update Project Information
+### 4. Update Project Information
 
 Make sure to update the following files:
 
@@ -135,13 +127,19 @@ Make sure to update the following files:
   });
   ```
 
-The last step is committing the changes:
+The next step is committing the changes:
 
 ```bash
 git commit -am "chore: update project information and configuration"
 ```
 
-### 6. Get your GitHub personal access token if you don't have one
+Finally, push the changes to your repository:
+
+```bash
+git push
+```
+
+### 5. Get your GitHub personal access token if you don't have one
 
 > You don't need to do this every time you create a new repository, only the first time. But you need save the token in a secure place, to use it in the next repositories.
 
@@ -166,7 +164,7 @@ git commit -am "chore: update project information and configuration"
 1. Click on `Generate token`
 1. Copy the generated token and save it in a secure place. You won't be able to see it again.
 
-### 7. Get your NPM token
+### 6. Get your NPM token
 
 1. Go to the [npm website](https://www.npmjs.com)
 1. Log in to your account
@@ -176,7 +174,7 @@ git commit -am "chore: update project information and configuration"
 1. Select `Automation` type and click on `Generate Token`
 1. Copy the generated token
 
-### 8. Add tokens to the GitHub repository secrets
+### 7. Add tokens to the GitHub repository secrets
 
 To enable the CI/CD pipeline and publish your library to NPM, you'll need to set up a GitHub and NPM token:
 
@@ -187,12 +185,36 @@ To enable the CI/CD pipeline and publish your library to NPM, you'll need to set
 1. Use the `GH_TOKEN` and `NPM_TOKEN` as the secret name and paste the token value
 1. Click on `Add secret`
 
-### 9. Setup GitHub Pages for documentation
+### 8. Setup GitHub Pages for documentation
 
 1. Go to your GitHub repository
 1. Click on `Settings` tab
 1. Click on `Pages` in the left sidebar
 1. Select `GitHub Actions` in `Build and deployment` source
+
+### 9. Protect the `main` branch
+
+To ensure that the `main` branch remains stable, production-ready, and secure, you can set up branch protection rules:
+
+1. Go to **Settings > Branches > Add Ruleset** in your repository.
+1. Set the **Ruleset name** to `Protect main branch`.
+1. In **Enforcement status**, select `Active`.
+1. Add target `default` in **Target branches**.
+1. Configure the following rules:
+   - Enable **Restrict deletions** - this prevents the branch from being deleted.
+   - Enable **Require linear history** - this ensures that the branch history is linear.
+   - Enable **Require signed commits** - this ensures that all commits are signed.
+   - Enable **Require a pull request before merging** - this ensures that all changes are reviewed.
+     - Disable `Merge` from the list of allowed merge methods.
+   - Enable **Require status checks to pass** - this ensures that all workflows pass.
+     - Enable **Require branches to be up to date before merging** - this ensures that the branch is up to date.
+     - Add the `lint`, `test` and `build` jobs to the list of required **status checks** and select `GitHub Actions` as the source.
+   - Enable **Block force push** - this prevents force pushes to the branch.
+
+With these rules in place:
+
+- The `main` branch will only accept changes via Pull Requests that pass all workflows.
+- Developers cannot push directly to `main`, reducing the risk of accidental changes.
 
 ## 📑 Scripts Overview
 
@@ -216,57 +238,77 @@ To enable the CI/CD pipeline and publish your library to NPM, you'll need to set
 
 ## 🔄 Development Workflow
 
-This template now supports a dual workflow setup, allowing flexibility depending on the project size and team structure. Choose between a simple `develop` workflow or a task-based workflow with feature branches:
+This template follows a Git branching model based on the [Gitflow Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). Here's how it works:
 
-### Option 1: Simple `develop` Workflow
+1. **Create branches for tasks** using descriptive prefixes such as:
 
-Best for solo developers or small projects.
-
-1. Work directly in the `develop` branch.
-1. Push changes to trigger the CI pipeline for linting and testing.
-1. When ready to release:
-   - Open a Pull Request from `develop` to `main`.
-   - Merge the PR to trigger the release and deploy workflows.
-
-### Option 2: Feature Branch Workflow
-
-Recommended for larger projects or teams to improve collaboration.
-
-1. Create branches for tasks using descriptive prefixes such as:
    - `feature/` for new features (e.g., `feature/add-login-page`).
    - `fix/` for bug fixes (e.g., `fix/header-alignment`).
    - `chore/` for maintenance tasks (e.g., `chore/update-dependencies`).
    - `docs/` for documentation updates (e.g., `docs/update-readme`).
    - 'refactor/' for code refactoring (e.g., 'refactor/update-logic').
    - 'test/' for test updates (e.g., 'test/update-unit-tests').
-1. Work on your changes in the corresponding branch.
-1. Open a Pull Request from the task branch to `develop`.
-1. Once the PR is approved and merged, repeat steps 1–3 for additional tasks.
-1. When ready to release:
-   - Open a Pull Request from `develop` to `main`.
-   - Merge the PR to trigger the release and deploy workflows.
 
-### Best Practices: Protect the `main` Branch
+     ```bash
+     git checkout -b feature/new-feature
+     git checkout -b fix/bug-fix
+     ```
 
-To ensure stability and maintain the integrity of the `main` branch, follow these steps:
+1. **Work on your branch**:
 
-1. Go to **Settings > Branches > Branch protection rules** in your repository.
-1. Click on `Add classic branch protection rule`.
-1. Set the branch name pattern to `main`.
+   - Make small, meaningful commits:
 
-   - Enable **Require a pull request before merging** - this ensures that all changes are reviewed.
-   - Disable **Require approvals** - this is optional, depending on your team's workflow.
-   - Enable **Require status checks to pass before merging** - this ensures that all workflows pass.
-   - Enable **Require branches to be up to date before merging** - this ensures that the branch is up to date.
-   - Enable **Require linear history** - this ensures that the branch history is linear.
-   - Enable **Do not allow bypassing the above settings** - this ensures that even admins follow the rules.
+     ```bash
+     git commit -m "Add input validation"
+     git commit -m "Fix JSON serializer issue"
+     ```
 
-1. Click on `Create` to save the changes.
+1. **Keep your branch updated**:
 
-With these rules in place:
+   - Before pushing or creating a PR, rebase your branch onto the latest `main`:
 
-- The `main` branch will only accept changes via Pull Requests that pass all workflows.
-- Developers cannot push directly to `main`, reducing the risk of accidental changes.
+     ```bash
+     git fetch origin
+     git rebase origin/main
+     ```
+
+1. **Resolve conflicts if necessary**:
+
+   - Edit conflicting files and mark them as resolved:
+
+     ```bash
+     git add conflicting-file.ts
+     ```
+
+   - Continue the rebase:
+
+     ```bash
+     git rebase --continue
+     ```
+
+1. **Push your changes**:
+
+   - If your branch has already been pushed, use `--force-with-lease` to avoid merge commits:
+
+     ```bash
+     git push --force-with-lease
+     ```
+
+1. **Create a Pull Request (PR)**:
+
+   - Open a PR from your branch to `main` on GitHub.
+   - Ensure all automated checks pass.
+
+1. **Rebase and Merge**: After the PR is approved, merge it into `main`:
+
+   - `Rebase and merge` the PR to keep the commit history clean.
+   - Delete the branch after merging both locally and remotely:
+
+     ```bash
+     git checkout main
+     git pull
+     git branch -d feature/new-feature
+     ```
 
 ## 📦 Releasing a Version
 
