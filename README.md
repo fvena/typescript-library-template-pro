@@ -313,182 +313,279 @@ This template includes a preconfigured docs folder powered by VitePress. To star
    npm run docs:dev
    ```
 
-## 🧪 Check your library
+## 🧪 Testing Your Library
 
-### How do I check my library in a separate project?
+To efficiently test your library during development, the recommended approach is to use a monorepo with playground projects. This allows you to test your library in real environments without publishing it.
 
-> This method is ideal for testing your library in a completely separate project environment.
+### 1. Setting up the Monorepo
 
-- Link your library to the global npm environment:
+First, configure your repository as a workspace by updating the root `package.json`:
 
-  1. Run `npm link` in your library's root directory.
-  1. In the project where you want to use your library, run `npm link <your-library-name>`
+```json
+{
+  "workspaces": ["playground/*"]
+}
+```
 
-- Unlink your library (optional):
+Then create your playground directory:
 
-  1. In the test project run `npm unlink <your-library-name>`.
-  1. Run `npm unlink` in your library root.
+```bash
+mkdir -p playground
+```
 
-- For more details, refer to the [npm link documentation](https://docs.npmjs.com/cli/v7/commands/npm-link).
+### 2. Creating Test Applications
 
-### How do I check my library within the same repository?
+You can create different types of playground projects based on your needs:
 
-> This approach is useful for quickly testing your library without setting up a separate project.
+#### Basic Node.js Application
 
-If you'd like to test your library directly within the same project, the best approach is to create a playground environment where you can link your library as a dependency. This allows you to test your library as if it were a published package.
-
-### Generic Steps to Test a Library
-
-1. **Create a testing environment**: Set up a playground folder in your project root (e.g., playground, examples, or similar).
-
-1. **Configure the Testing Environment**: Depending on your library, set up the appropriate tooling in the playground (Vite, Vue, Vanilla, ...).
-
-1. **Set the module type**: Update the `playground/package.json` to use ESM modules:
-
-   ```json
-   {
-     "type": "module"
-   }
-   ```
-
-1. **Add the playground as a workspace**: You need install all dependencies with the `npm install` command in the root folder, to pass the CI/CD pipeline.
-
-   ```json
-   {
-     "workspaces": ["playground"]
-   }
-   ```
-
-   **Important**: You need to build the library before running the linting and testing scripts. Update the `ci.yml` file to include the build step before running the tests:
-
-   ```yaml
-   - run: npm ci --ignore-scripts
-   - run: npm run build
-   - run: npm run lint
-   - run: npm run typecheck
-   ```
-
-1. **Link the Library**: Add your library as a dependency in the `playground/package.json`. For example:
-
-   ```json
-   {
-     "dependencies": {
-       "typescript-library-template-pro": "file:../"
-     }
-   }
-   ```
-
-   **Important**: After editing the package.json, install the dependencies:
+1. **Initialize a new project:**
 
    ```bash
-   npm install
-   ```
-
-### Example for a Vanilla TypeScript Library
-
-This example demonstrates how to set up a playground to test a TypeScript library. Follow these steps:
-
-1. **Create a Playground Folder**
-
-   ```bash
-   mkdir playground
    cd playground
+   mkdir basic
+   cd basic
    npm init -y
+   npm install typescript ts-node --save-dev
    ```
 
-1. **Set the module type**: Update the `playground/package.json` to use ESM modules:
+2. **Configure TypeScript:**
+
+   Create a `tsconfig.json` file:
 
    ```json
    {
-     "type": "module"
-   }
-   ```
-
-1. **Link the Library**: Add your library as a dependency.
-
-   ```json
-   {
-     "dependencies": {
-       "typescript-library-template-pro": "file:../"
+     "compilerOptions": {
+       "target": "ES2020",
+       "module": "NodeNext",
+       "moduleResolution": "NodeNext",
+       "esModuleInterop": true,
+       "outDir": "./dist",
+       "strict": true
      }
    }
    ```
 
-   Then, install the dependencies:
-
-   ```bash
-   npm install
-   ```
-
-1. **Install TypeScript and Watcher**
-
-   ```bash
-    npm install typescript tsc-watch --save-dev
-   ```
-
-1. **Update Scripts**: Add the following scripts to the `playground/package.json` file:
+3. **Add scripts to `package.json`:**
 
    ```json
    {
-    ...
-    "scripts": {
-      "dev": "tsc-watch --noClear --onSuccess \"node ./dist/index.js\"",
-      "build": "tsc"
-    },
-   }
-   ```
-
-1. **Test your library**: Add a file, `index.ts`, in the `playground` folder:
-
-   ```typescript
-   import { add } from "typescript-library-template-pro";
-
-   console.log(add(1, 2));
-   ```
-
-1. **Run both projects**: Run the library and the playground in separate terminals in watch mode:
-
-   ```bash
-    npm run dev
-   ```
-
-### Example for a Browser Library
-
-This example demonstrates how to set up a playground to test a library that works in a browser environment. Follow these steps:
-
-1. **Create a Playground Using Vite**: Use the Vite assistant to scaffold a new project. In the root folder, run:
-
-   ```bash
-   npm create vite@latest playground
-   ```
-
-1. **Link the Library**: Add your library as a dependency in the `playground/package.json`:
-
-   ```json
-   {
-     "dependencies": {
-       "typescript-library-template-pro": "file:../"
+     "type": "module",
+     "scripts": {
+       "dev": "ts-node --esm src/index.ts"
      }
    }
    ```
 
-   Then, install the dependencies:
+4. **Create a test file:**
 
    ```bash
-    npm install
+   mkdir src
    ```
 
-1. **Test your library**: Add library imports to the playground code, where you can test it:
+   In `src/index.ts`:
 
    ```typescript
    import { add } from "typescript-library-template-pro";
+
+   console.log("Result:", add(2, 3));
    ```
 
-1. **Run both projects**: Run the library and the playground in separate terminals in watch mode:
+#### Framework-based Applications
+
+You can quickly create applications using popular frameworks:
+
+##### Vite (React, Vue, etc.)
+
+```bash
+npm create vite@latest playground/vite-app -- --template vue-ts
+# Or --template react-ts, vanilla-ts, etc.
+```
+
+##### Next.js
+
+```bash
+npx create-next-app playground/next-app
+```
+
+##### Vue CLI
+
+```bash
+npm init vue@latest playground/vue-app
+```
+
+### 3. Adding Your Library as a Dependency
+
+You have two options to link your library:
+
+#### Option 1: Direct Installation
+
+Navigate to your playground project and install the library directly:
+
+```bash
+cd playground/basic
+npm install ../../
+```
+
+#### Option 2: Workspace Reference
+
+In your playground project's `package.json`, add your library as a workspace dependency:
+
+```json
+{
+  "dependencies": {
+    "typescript-library-template-pro": "workspace:*"
+  }
+}
+```
+
+Then run from the root directory:
+
+```bash
+npm install
+```
+
+Both options create a symlink to your library, allowing changes to be reflected immediately.
+
+### 4. Development Workflow
+
+Update the root `package.json` with convenience scripts:
+
+```json
+"scripts": {
+  "dev": "npm run build -- --watch",
+  "dev:basic": "npm run dev --workspace=playground/basic",
+  "dev:vite": "npm run dev --workspace=playground/vite-app"
+}
+```
+
+Run your library in watch mode in one terminal:
+
+```bash
+npm run dev
+```
+
+And your playground app in another terminal:
+
+```bash
+npm run dev:basic
+# or
+npm run dev:vite
+```
+
+### 5. Working with Multiple Playground Projects
+
+You can create multiple playground projects to test different aspects of your library:
+
+```
+your-library/
+├── src/
+├── playground/
+│   ├── basic/           # Basic Node.js application
+│   ├── vite-app/        # React/Vue application
+│   ├── next-app/        # Next.js application
+│   └── vue-app/         # Vue application
+├── package.json         # With workspace config
+└── tsconfig.json
+```
+
+This structure allows you to:
+
+- Test your library in different environments
+- Create examples for different use cases
+- Validate compatibility with various frameworks
+- Develop comprehensive documentation examples
+
+Each playground project can be configured and run independently, providing a complete testing ecosystem for your library.
+
+## 🎮 Playground Environment
+
+This template includes a tool to easily set up and test your library in a playground environment:
+
+```bash
+# Setup a playground
+npm run playground:setup
+
+# In one terminal, run your library in watch mode
+npm run dev
+
+# In another terminal, run the playground
+npm run playground:dev
+```
+
+You can choose from multiple frontend frameworks to test your library:
+
+- Vanilla TypeScript (Node.js environment)
+- Browser (Vite + vanilla JS/TS)
+- React (Vite + React)
+- Vue (Vite + Vue 3)
+- Next.js
+- Nuxt 3
+
+The playground lets you test your library as if it were being used in a real application. This is ideal for rapid prototyping and testing before publishing.
+
+## 📊 Performance Benchmarking
+
+The template includes a benchmarking system to ensure your library maintains optimal performance:
+
+```bash
+# Run all benchmarks
+npm run benchmark
+
+# Run a specific benchmark
+npm run benchmark add
+
+# Run benchmarks in watch mode (auto-run on file changes)
+npm run benchmark:watch
+```
+
+Benchmark results are saved to `benchmark-results.json`, allowing you to track performance changes over time. To add a new benchmark, create a file in the `benchmarks` directory with the `.benchmark.js` extension.
+
+## 📝 Changelog Management
+
+The template uses semantic-release for versioning, with a customized changelog template that organizes changes into categories:
+
+- New Features
+- Bug Fixes
+- Performance Improvements
+- Documentation Changes
+- Build System & Dependencies
+- Tests
+- Code Refactoring
+- Styles
+
+Changelogs are automatically generated based on commit messages, following the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+
+### Development Workflow
+
+For the best development experience:
+
+1. **Start your library in watch mode**:
 
    ```bash
-    npm run dev
+   npm run dev
    ```
+
+2. **In another terminal, start your test application**:
+
+   ```bash
+   npm run dev:app
+   ```
+
+3. **Make changes to your library code** - they will be automatically rebuilt
+
+4. **See changes reflected in your test app** - most modern frameworks support hot module replacement
+
+### Troubleshooting Hot Reloading
+
+If changes to your library aren't automatically reflected:
+
+1. Ensure your library's `build` script includes the `--watch` flag
+2. Make sure your framework supports hot module replacement
+3. Try using `preserve: true` in your tsup configuration
+4. For stubborn cases, you might need to manually refresh the browser
+
+This approach provides a streamlined development experience with real-time feedback while keeping your library and test applications cleanly separated.
 
 ## 🧩 FAQs
 
