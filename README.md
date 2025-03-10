@@ -74,7 +74,7 @@ This template aims to simplify the process, providing you with a pre-configured,
 - **Testing Ready**: Includes [Vitest](https://vitest.dev) for fast, reliable unit testing.
 - **Conventional Commits**: Enforces commit message standards with [Commitlint](https://commitlint.js.org) and [Husky](https://typicode.github.io/husky/).
 - **Documentation**: Powered by [Vitepress](https://vitepress.dev) for easy and interactive documentation.
-- **Automated Releases**: Handles versioning and changelogs with [Release-it](https://github.com/release-it/release-it).
+- **Automated Releases**: Handles versioning and changelogs with [semantic-release](https://semantic-release.gitbook.io/semantic-release/).
 - **CI/CD Pipelines**: Configured with [GitHub Actions](https://github.com/features/actions) for linting, testing, publishing, and deploying docs.
 - **Dependabot Integration**: Keeps your dependencies updated automatically.
 
@@ -238,77 +238,57 @@ With these rules in place:
 
 ## 🔄 Development Workflow
 
-This template follows a Git branching model based on the [Gitflow Workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). Here's how it works:
+This template follows a Trunk-based development model (using `main` branch), which is ideal for small teams or individual developers:
 
-1. **Create branches for tasks** using descriptive prefixes such as:
+1. **Direct development on `main` for simple changes**:
 
-   - `feature/` for new features (e.g., `feature/add-login-page`).
-   - `fix/` for bug fixes (e.g., `fix/header-alignment`).
-   - `chore/` for maintenance tasks (e.g., `chore/update-dependencies`).
-   - `docs/` for documentation updates (e.g., `docs/update-readme`).
-   - 'refactor/' for code refactoring (e.g., 'refactor/update-logic').
-   - 'test/' for test updates (e.g., 'test/update-unit-tests').
-
-     ```bash
-     git checkout -b feature/new-feature
-     git checkout -b fix/bug-fix
-     ```
-
-1. **Work on your branch**:
-
+   - For small, non-disruptive changes, you can work directly on the `main` branch.
    - Make small, meaningful commits:
 
      ```bash
-     git commit -m "Add input validation"
-     git commit -m "Fix JSON serializer issue"
+     git commit -m "feat: add input validation"
+     git commit -m "fix: resolve JSON serializer issue"
      ```
 
-1. **Keep your branch updated**:
+2. **Short-lived feature branches for more complex work**:
 
-   - Before pushing or creating a PR, rebase your branch onto the latest `main`:
+   - For features requiring multiple commits or that might destabilize the codebase:
+
+     ```bash
+     git checkout -b feature/new-component
+     ```
+
+   - Keep them regularly synchronized with `main`:
 
      ```bash
      git fetch origin
      git rebase origin/main
      ```
 
-1. **Resolve conflicts if necessary**:
-
-   - Edit conflicting files and mark them as resolved:
-
-     ```bash
-     git add conflicting-file.ts
-     ```
-
-   - Continue the rebase:
-
-     ```bash
-     git rebase --continue
-     ```
-
-1. **Push your changes**:
-
-   - If your branch has already been pushed, use `--force-with-lease` to avoid merge commits:
-
-     ```bash
-     git push --force-with-lease
-     ```
-
-1. **Create a Pull Request (PR)**:
-
-   - Open a PR from your branch to `main` on GitHub.
-   - Ensure all automated checks pass.
-
-1. **Rebase and Merge**: After the PR is approved, merge it into `main`:
-
-   - `Rebase and merge` the PR to keep the commit history clean.
-   - Delete the branch after merging both locally and remotely:
+   - Once completed, integrate quickly back to `main`:
 
      ```bash
      git checkout main
-     git pull
-     git branch -d feature/new-feature
+     git merge --ff-only feature/new-component
+     git push
+     git branch -d feature/new-component
      ```
+
+3. **Commit naming conventions**:
+
+   - Follow [Conventional Commits](https://www.conventionalcommits.org/) to facilitate automatic versioning:
+     - `feat:` for new features
+     - `fix:` for bug fixes
+     - `docs:` for documentation updates
+     - `chore:` for maintenance tasks
+     - `refactor:` for code refactoring
+     - `test:` for adding or modifying tests
+
+4. **Continuous release**:
+   - Each merge to `main` that follows the conventions will automatically trigger the release process based on the semantics of the change.
+   - No need to create and maintain separate release branches.
+
+This approach greatly simplifies the workflow while maintaining the benefits of continuous integration and automatic semantic versioning.
 
 ## 📦 Releasing a Version
 
