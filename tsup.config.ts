@@ -7,6 +7,7 @@ const config: Options = {
   entryPoints: ["src/index.ts"],
   format: ["cjs", "esm"],
   outDir: "dist",
+  sourcemap: true,
 };
 
 export default defineConfig(config);
