@@ -39,7 +39,13 @@
   },
   "lint-staged": {
     "*": "prettier -w --ignore-unknown",
-    "*.{js,ts}": "eslint --fix"
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "typecheck"
+    ],
+    "*.{js,jsx,mjs,cjs}": [
+      "eslint --fix"
+    ]
   },
   "keywords": [
     "typescript",
