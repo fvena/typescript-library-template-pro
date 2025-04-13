@@ -1,11 +1,7 @@
 ---
 description: Testing Guidelines for TypeScript Library
-globs: test/**, src/**/*.test.ts
-alwaysApply: false
----
----
-description: Testing Guidelines for TypeScript Library
-globs: test/**, src/**/*.test.ts
+globs:
+alwaysApply: true
 ---
 
 # Testing Guidelines

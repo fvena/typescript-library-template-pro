@@ -1,8 +1,9 @@
 ---
 description: TypeScript and Code Quality Guidelines
-globs: src/**, test/**, **/*.ts
-alwaysApply: false
+globs:
+alwaysApply: true
 ---
+
 # TypeScript and Code Quality Guidelines
 
 These rules provide guidance on TypeScript usage, code quality, and architectural patterns for this library project.

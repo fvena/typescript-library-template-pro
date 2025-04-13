@@ -1,7 +1,7 @@
 ---
 description: Documentation Guidelines for TypeScript Library
-globs: docs/**, **/*.md, src/**/*.ts
-alwaysApply: false
+globs:
+alwaysApply: true
 ---
 # Documentation Guidelines
 

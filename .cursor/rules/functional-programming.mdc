@@ -1,8 +1,9 @@
 ---
 description: Guidelines for Functional Programming in TypeScript
-globs: src/**, test/**, **/*.ts
-alwaysApply: false
+globs:
+alwaysApply: true
 ---
+
 # Functional Programming in TypeScript
 
 These rules provide guidelines on applying functional programming principles in the development of this TypeScript library.

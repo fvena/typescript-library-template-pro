@@ -1,8 +1,9 @@
 ---
 description: Guidelines for Module Design and Public API
-globs: src/**, **/*.ts
-alwaysApply: false
+globs:
+alwaysApply: true
 ---
+
 # Module Design and Public API
 
 These rules provide guidelines for module design, code organization, and public API design for this TypeScript library.

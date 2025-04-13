@@ -1,8 +1,9 @@
 ---
 description: General Development Guidelines
-globs: *, **/*
-alwaysApply: false
+globs:
+alwaysApply: true
 ---
+
 # General Development Guidelines
 
 These rules provide guidance for overall project structure, workflow, and general development practices for this TypeScript library.

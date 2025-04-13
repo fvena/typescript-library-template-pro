@@ -3,7 +3,6 @@ import swc from "unplugin-swc";
 
 export default defineConfig({
   plugins: [
-     
     swc.vite({
       module: { type: "es6" },
     }),
@@ -11,6 +10,7 @@ export default defineConfig({
   test: {
     clearMocks: true,
     coverage: {
+      exclude: ["**/*.d.ts"],
       include: ["src/**/*.ts"],
       provider: "v8",
       reporter: ["text", "lcovonly"],
