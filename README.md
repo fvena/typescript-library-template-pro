@@ -107,21 +107,21 @@ The deployment process is **fully automated** with GitHub Actions.
 
 ## Complete Documentation
 
-For detailed instructions on setup, customization, and advanced features, visit our <a href="https://fvena.github.io/typescript-library-template-pro/" target="_blank">📘 documentation site</a>.
+For detailed instructions on setup, customization, and advanced features, visit our <a href="https://fvena.github.io/typescript-library-starter-pro-docs/es/" target="_blank">📘 documentation site</a>.
 
 **Popular Sections**
 
-- **[Getting Started Guide](https://fvena.github.io/typescript-library-template-pro/guide/getting-started.html)**: Step-by-step setup instructions
-- **[Development Workflow](https://fvena.github.io/typescript-library-template-pro/guide/development-workflow.html)**: Best practices for smooth coding
-- **[Testing Strategies](https://fvena.github.io/typescript-library-template-pro/guide/testing-strategies.html)**: Unit testing, debugging, and CI
-- **[Build & Configuration](https://fvena.github.io/typescript-library-template-pro/guide/build-configuration.html)**: Customizing the output format
-- **[Release Process](https://fvena.github.io/typescript-library-template-pro/guide/release-process.html)**: Learn how versioning and publishing work
+- **[Getting Started Guide](https://fvena.github.io/typescript-library-starter-pro-docs/es/guide/getting-started/create-repository)**: Step-by-step setup instructions
+- **[Development Workflow](https://fvena.github.io/typescript-library-starter-pro-docs/es/guide/development/workflow)**: Best practices for smooth coding
+- **[Testing Strategies](https://fvena.github.io/typescript-library-starter-pro-docs/es/guide/development/testing)**: Unit testing, debugging, and CI
+- **[Build & Configuration](https://fvena.github.io/typescript-library-starter-pro-docs/es/guide/development/build)**: Customizing the output format
+- **[Release Process](https://fvena.github.io/typescript-library-starter-pro-docs/es/guide/development/release-process)**: Learn how versioning and publishing work
 
 ## Need Help?
 
-- **Check the FAQs**: Common questions are answered in the [documentation](https://fvena.github.io/typescript-library-template-pro/)
+- **Check the FAQs**: Common questions are answered in the [documentation](https://fvena.github.io/typescript-library-starter-pro-docs/es/guide/faqs)
 - **Open an Issue**: For bugs or feature requests
-- **Contribute**: PRs are welcome! See our contribution guidelines
+- **Contribute**: PRs are welcome! See our [contribution guidelines](https://fvena.github.io/typescript-library-starter-pro-docs/es/guide/contributing/guide)
 
 ## License
 
