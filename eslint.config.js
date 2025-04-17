@@ -1,3 +1,3 @@
-import eslintNode from "personal-style-guide/eslint/node";
+import eslintBrowser from "personal-style-guide/eslint/browser";
 
-export default [...eslintNode];
+export default [...eslintBrowser];

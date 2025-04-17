@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { add } from "../src/utilities";
+import { add } from "../../src/utilities";
 
 describe("Utils", () => {
   it("add", () => {

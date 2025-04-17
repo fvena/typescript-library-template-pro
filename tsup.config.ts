@@ -17,6 +17,7 @@ export default defineConfig((options) => {
     format: ["esm", "cjs"], // Generates both ESM and CJS formats simultaneously
     minify: !isWatch, // Minifies the output to reduce bundle size
     outDir: "./dist", // Directory where build files will be output
+    platform: "neutral", // Important: ensures compatibility with Node.js and browser
     sourcemap: true, // Generate source maps to make debugging easier
     treeshake: true, // Enables tree shaking to remove unused code and reduce bundle size
   };

@@ -10,12 +10,29 @@ export default defineConfig({
   test: {
     clearMocks: true,
     coverage: {
-      exclude: ["**/*.d.ts"],
       include: ["src/**/*.ts"],
       provider: "v8",
       reporter: ["text", "lcovonly"],
     },
-    environment: "node", // jsdom
+    environment: "node",
     globals: true,
+    workspace: [
+      {
+        extends: true,
+        test: {
+          environment: "node",
+          include: ["test/core/**/*.test.ts", "test/terminal/**/*.test.ts"],
+          name: "terminal",
+        },
+      },
+      {
+        extends: true,
+        test: {
+          environment: "jsdom",
+          include: ["test/browser/**/*.test.ts"],
+          name: "browser",
+        },
+      },
+    ],
   },
 });

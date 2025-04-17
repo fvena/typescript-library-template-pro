@@ -6,7 +6,7 @@
     "dev": "tsx watch --clear-screen=false src/index.ts"
   },
   "dependencies": {
-    "typescript-library-template-pro": "*"
+    "@franvena/consoleui": "*"
   },
   "devDependencies": {
     "tsx": "^4.6.2"

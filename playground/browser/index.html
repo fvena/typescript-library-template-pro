@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <title>ConsoleUI Playground</title>
+  </head>
+  <body>
+    <div id="app">
+      <div>
+        <img src="/javascript.svg" class="logo" alt="JavaScript logo" />
+        <h1>ConsoleUI</h1>
+
+        <div class="calculator">
+          <input type="number" id="num1" placeholder="First number" value="5" />
+          <span class="operator">+</span>
+          <input type="number" id="num2" placeholder="Second number" value="3" />
+          <span class="operator">=</span>
+          <input id="result" placeholder="Result" value="0" disabled />
+        </div>
+        <div class="console-info">
+          <p>Check the browser console (F12) for more examples!</p>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

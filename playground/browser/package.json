@@ -1,0 +1,14 @@
+{
+  "name": "browser",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@franvena/consoleui": "*"
+  },
+  "devDependencies": {
+    "vite": "^6.3.1"
+  }
+}

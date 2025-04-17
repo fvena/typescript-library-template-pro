@@ -2,10 +2,8 @@
   "extends": "personal-style-guide/typescript/node",
   "include": ["src"],
   "compilerOptions": {
-    "outDir": "dist",
-    "baseUrl": ".",
     "paths": {
-      "typescript-library-template-pro": ["../dist"]
+      "@franvena/consoleui": ["../../dist"]
     }
   }
 }
