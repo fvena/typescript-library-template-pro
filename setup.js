@@ -47,6 +47,7 @@ const question = (query, defaultValue = "", info = "", required = false) =>
     });
   });
 
+// Function to confirm a question
 const confirm = (query, defaultValue = true, info = "") =>
   new Promise((resolve) => {
     const baseQuery = `   • ${query.replace(/:$/, "")}`;
@@ -62,6 +63,156 @@ const confirm = (query, defaultValue = true, info = "") =>
       resolve(result);
     });
   });
+
+// Function to display an interactive selector
+const select = async (query, options, defaultKey) => {
+  return new Promise((resolve) => {
+    const baseQuery = `   • ${query.replace(/:$/, "")}`;
+
+    // Get keys and labels
+    const keys = Object.keys(options);
+    const labels = Object.values(options);
+
+    // Set default index
+    let selectedIndex = defaultKey ? keys.indexOf(defaultKey) : 0;
+    if (selectedIndex < 0) selectedIndex = 0;
+
+    // Original stdin settings to restore later
+    const stdinIsRaw = process.stdin.isRaw;
+    const stdinIsPaused = process.stdin.isPaused();
+
+    // Function to render options
+    const renderOptions = (firstRender = false) => {
+      if (!firstRender) {
+        // Move cursor up to the first line (question + number of options)
+        process.stdout.write(`\u001B[${labels.length + 1}A\r`);
+      }
+
+      // Clear all lines from cursor down
+      process.stdout.write("\u001B[J");
+
+      // Show question
+      process.stdout.write(`${baseQuery}\n`);
+
+      // Show options
+      for (const [index, label] of labels.entries()) {
+        const indicator = index === selectedIndex ? ">" : " ";
+        const highlight = index === selectedIndex ? CYAN : "";
+        process.stdout.write(`     ${highlight}${indicator} ${label}${NC}\n`);
+      }
+
+      // Keep cursor at the start of the line after options
+      process.stdout.write("\r");
+    };
+
+    // Create a flag to ensure cleanup happens only once
+    let isCleanedUp = false;
+
+    // Comprehensive cleanup function
+    const cleanup = () => {
+      if (isCleanedUp) return;
+      isCleanedUp = true;
+
+      // Restore stdin to original state
+      if (process.stdin.isTTY) {
+        if (stdinIsRaw !== process.stdin.isRaw) {
+          process.stdin.setRawMode(stdinIsRaw);
+        }
+
+        if (stdinIsPaused && !process.stdin.isPaused()) {
+          process.stdin.pause();
+        } else if (!stdinIsPaused && process.stdin.isPaused()) {
+          process.stdin.resume();
+        }
+      }
+
+      // Remove all listeners we added
+      process.stdin.removeListener("data", keyHandler);
+
+      // Show cursor if it was hidden
+      process.stdout.write("\u001B[?25h");
+    };
+
+    // Key handler function
+    const keyHandler = (data) => {
+      const key = data.toString();
+
+      // Prevent any output for arrow keys at boundaries
+      if (
+        (key === "\u001B[A" && selectedIndex === 0) ||
+        (key === "\u001B[B" && selectedIndex === labels.length - 1)
+      ) {
+        // Clear any potential character output
+        process.stdout.write("\r\u001B[K");
+        return;
+      }
+
+      switch (key) {
+        case "\r":
+        case "\n": {
+          // Enter
+          // Move cursor up to the start of our content
+          process.stdout.write(`\u001B[${labels.length + 2}A\r`);
+          // Clear everything
+          process.stdout.write("\u001B[J");
+          // Show final result
+          process.stdout.write(`${baseQuery}: ${GREEN}${labels[selectedIndex]}${NC}\n`);
+
+          // Clean up and resolve
+          cleanup();
+          resolve(keys[selectedIndex]);
+
+          break;
+        }
+
+        case "\u0003": {
+          // Ctrl+C
+          cleanup();
+          throw new Error("User aborted setup");
+        }
+
+        case "\u001B[A": {
+          // Up arrow
+          if (selectedIndex > 0) {
+            selectedIndex--;
+            renderOptions();
+          }
+          break;
+        }
+
+        case "\u001B[B": {
+          // Down arrow
+          if (selectedIndex < labels.length - 1) {
+            selectedIndex++;
+            renderOptions();
+          }
+          break;
+        }
+
+        default: {
+          // Clear any unwanted character output
+          process.stdout.write("\r\u001B[K");
+          break;
+        }
+      }
+    };
+
+    // Setup
+    if (process.stdin.isTTY) {
+      // Save original state
+      process.stdin.setRawMode(true);
+    }
+
+    // Initial render
+    renderOptions(true);
+
+    // Add listener with 'once: false' to ensure it stays active
+    process.stdin.on("data", keyHandler);
+
+    // Safety cleanup if process is about to exit
+    process.on("beforeExit", cleanup);
+  });
+};
 
 // Define ANSI colors
 const RED = "\u001B[0;31m";
@@ -180,7 +331,8 @@ async function setup() {
 
     // Update playground
     await runTask("Updating playground", "Updated playground", async () => {
-      await updatePlayground(libraryInfo);
+      await updatePlaygroundTerminal(libraryInfo);
+      await updatePlaygroundBrowser(libraryInfo);
     });
 
     // Clean README
@@ -197,17 +349,21 @@ async function setup() {
       },
     );
 
+    // Configure browser support, if "both" is selected, nothing will be removed
+    if (libraryInfo.environment === "node") {
+      await runTask("Removing browser support", "Removed browser support", async () => {
+        await removeBrowserSupport();
+      });
+    } else if (libraryInfo.environment === "browser") {
+      await runTask("Removing node support", "Removed node support", async () => {
+        await removeNodeSupport();
+      });
+    }
+
     // Publish library
     if (libraryInfo.publishLib) {
       await runTask("Publishing npm library", "Published npm library", async () => {
         await publishLibrary();
-      });
-    }
-
-    // Configure browser support
-    if (libraryInfo.browserSupport) {
-      await runTask("Configuring browser support", "Configured browser support", async () => {
-        await configureBrowserSupport();
       });
     }
 
@@ -326,11 +482,11 @@ function getGitInfo() {
 async function collectLibraryInfo(gitInfo) {
   const info = {
     author: gitInfo.author || "",
-    browserSupport: false,
     bugs: "",
     commitChanges: true,
     description: "",
     email: gitInfo.email || "",
+    environment: "both",
     homepage: "",
     includeVitePress: true,
     keywords: [],
@@ -385,6 +541,15 @@ async function collectLibraryInfo(gitInfo) {
 
   printColored(DIM, "\n   Configuration & Features\n");
 
+  // Ask for supported environments
+  const environmentOptions = {
+    both: "Node.js and browser",
+    browser: "Browser only",
+    node: "Node.js only",
+  };
+
+  info.environment = await select(`Supported environments`, environmentOptions, "both");
+
   // VitePress Documentation
   info.includeVitePress = await confirm(`Include VitePress documentation?`);
 
@@ -393,13 +558,6 @@ async function collectLibraryInfo(gitInfo) {
     `Publish library to npm?`,
     true,
     `Verifies name availability and prevents CI errors`,
-  );
-
-  // Browser Support
-  info.browserSupport = await confirm(
-    `Include browser support?`,
-    false,
-    `Configures the library for browser environments`,
   );
 
   // Commit changes
@@ -522,13 +680,11 @@ async function updateVitePressConfig(info) {
 /**
  * Update playground configuration
  */
-async function updatePlayground(info) {
+async function updatePlaygroundTerminal(info) {
   try {
-    // Update playground package.json
-    const playgroundPackagePath = "./playground/package.json";
+    // Update terminal playground package.json
+    const playgroundPackagePath = "./playground/terminal/package.json";
     const playgroundPackage = JSON.parse(await fs.readFile(playgroundPackagePath, "utf8"));
-
-    // Update dependency name
     const oldDependencyName = Object.keys(playgroundPackage.dependencies)[0];
     playgroundPackage.dependencies = {
       [info.name]: "*",
@@ -540,8 +696,8 @@ async function updatePlayground(info) {
       "utf8",
     );
 
-    // Update playground index.ts
-    const indexPath = "./playground/src/index.ts";
+    // Update terminal playground index.ts
+    const indexPath = "./playground/terminal/src/index.ts";
     let indexContent = await fs.readFile(indexPath, "utf8");
 
     indexContent = indexContent.replaceAll(
@@ -551,17 +707,60 @@ async function updatePlayground(info) {
 
     await fs.writeFile(indexPath, indexContent, "utf8");
 
-    // Update playground tsconfig.json
-    const tsconfigPath = "./playground/tsconfig.json";
+    // Update terminal playground tsconfig.json
+    const tsconfigPath = "./playground/terminal/tsconfig.json";
     const tsconfig = JSON.parse(await fs.readFile(tsconfigPath, "utf8"));
 
+    const oldPath = tsconfig.compilerOptions.paths[oldDependencyName];
     tsconfig.compilerOptions.paths = {
-      [info.name]: ["../src"],
+      [info.name]: [oldPath],
     };
 
     await fs.writeFile(tsconfigPath, JSON.stringify(tsconfig, undefined, 2) + "\n", "utf8");
   } catch (error) {
     throw new Error(`Failed to update playground: ${error.message}`);
+  }
+}
+
+async function updatePlaygroundBrowser(info) {
+  try {
+    // Update browser playground package.json
+    const playgroundPackagePath = "./playground/browser/package.json";
+    const playgroundPackage = JSON.parse(await fs.readFile(playgroundPackagePath, "utf8"));
+    const oldDependencyName = Object.keys(playgroundPackage.dependencies)[0];
+    playgroundPackage.dependencies = {
+      [info.name]: "*",
+    };
+
+    await fs.writeFile(
+      playgroundPackagePath,
+      JSON.stringify(playgroundPackage, undefined, 2) + "\n",
+      "utf8",
+    );
+
+    // Update browser playground vite.config.js
+    const viteConfigPath = "./playground/browser/vite.config.js";
+    let viteConfigContent = await fs.readFile(viteConfigPath, "utf8");
+
+    viteConfigContent = viteConfigContent.replaceAll(
+      new RegExp(`"${oldDependencyName}"`, "g"),
+      `"${info.name}"`,
+    );
+
+    await fs.writeFile(viteConfigPath, viteConfigContent, "utf8");
+
+    // Update browser playground main.js
+    const mainPath = "./playground/browser/src/main.js";
+    let mainContent = await fs.readFile(mainPath, "utf8");
+
+    mainContent = mainContent.replaceAll(
+      new RegExp(`"${oldDependencyName}"`, "g"),
+      `"${info.name}"`,
+    );
+
+    await fs.writeFile(mainPath, mainContent, "utf8");
+  } catch (error) {
+    throw new Error(`Failed to update browser playground: ${error.message}`);
   }
 }
 
@@ -660,7 +859,6 @@ async function updateDependencies() {
 async function publishLibrary() {
   try {
     await execAsync("npm run build", { stdio: "ignore" });
-    // await execAsync("npm publish", { stdio: "ignore" });
   } catch (error) {
     const errorMessage = error.message || "";
     const error_ = errorMessage.includes("403")
@@ -675,10 +873,10 @@ async function publishLibrary() {
 // Ask if the user wants to commit changes
 async function commitChanges() {
   try {
-    // await execAsync("git add .", { stdio: "ignore" });
-    // await execAsync('git commit -m "feat: update project information and configuration"', {
-    //   stdio: "inherit",
-    // });
+    await execAsync("git add .", { stdio: "ignore" });
+    await execAsync('git commit -m "feat: update project information and configuration"', {
+      stdio: "inherit",
+    });
   } catch (error) {
     throw new Error(
       `Failed to commit changes: ${error.message}. Please commit your changes manually.`,
@@ -687,45 +885,151 @@ async function commitChanges() {
 }
 
 /**
- * Configure browser support
+ * Remove browser support
  */
-async function configureBrowserSupport() {
+async function removeBrowserSupport() {
   try {
+    // Simplify playground structure by moving terminal playground to root
+    await fs.mkdir("./playground_temp", { recursive: true });
+    await fs.cp("./playground/terminal", "./playground_temp", { recursive: true });
+    await fs.rm("./playground", { force: true, recursive: true });
+    await fs.rename("./playground_temp", "./playground");
+
+    const viteConfigPath = "./playground/browser/vite.config.js";
+    let viteConfigContent = await fs.readFile(viteConfigPath, "utf8");
+    viteConfigContent = viteConfigContent.replaceAll(new RegExp(`"../../dist"`, "g"), `"../dist"`);
+    await fs.writeFile(viteConfigPath, viteConfigContent, "utf8");
+
+    // Simplify test structure by moving terminal tests to root
+    await fs.mkdir("./test_temp", { recursive: true });
+    await fs.cp("./test/core", "./test_temp", { recursive: true });
+    await fs.cp("./test/terminal", "./test_temp", { recursive: true });
+    await fs.rm("./test", { force: true, recursive: true });
+    await fs.rename("./test_temp", "./test");
+
     // Update tsconfig.json
     const tsconfigPath = "./tsconfig.json";
     const tsconfig = JSON.parse(await fs.readFile(tsconfigPath, "utf8"));
-    tsconfig.extends = "personal-style-guide/typescript/browser";
+    tsconfig.extends = "personal-style-guide/typescript/node";
     await fs.writeFile(tsconfigPath, JSON.stringify(tsconfig, undefined, 2) + "\n", "utf8");
 
     // Update eslint.config.js
     const eslintPath = "./eslint.config.js";
     let eslintContent = await fs.readFile(eslintPath, "utf8");
-    eslintContent = eslintContent.replace(
-      /import eslint\w+ from "personal-style-guide\/eslint\/\w+"/,
-      'import eslintBrowser from "personal-style-guide/eslint/browser"',
-    );
-    eslintContent = eslintContent.replace(
-      /export default \[.*?\]/s,
-      "export default [...eslintBrowser]",
-    );
+    eslintContent = eslintContent.replace(/import eslintBrowser from/, "import eslintNode from");
+    eslintContent = eslintContent.replace(/\[\.\.\.eslintBrowser\]/, "[...eslintNode]");
     await fs.writeFile(eslintPath, eslintContent, "utf8");
 
     // Update vitest.config.ts
     const vitestPath = "./vitest.config.ts";
     let vitestContent = await fs.readFile(vitestPath, "utf8");
-    vitestContent = vitestContent.replace(/environment: ".*?"/, 'environment: "jsdom"');
+    vitestContent = vitestContent.replace(/workspace: \[\s*\{[\s\S]*?\}\s*\],/, "");
+    vitestContent = vitestContent.replace(/environment: ".*?"/, 'environment: "node"');
     await fs.writeFile(vitestPath, vitestContent, "utf8");
 
-    // Update package.json to add jsdom dependency
+    // Update tsup.config.ts
+    const tsupPath = "./tsup.config.ts";
+    let tsupContent = await fs.readFile(tsupPath, "utf8");
+    tsupContent = tsupContent.replace(/platform: "neutral"/, 'platform: "node"');
+    await fs.writeFile(tsupPath, tsupContent, "utf8");
+
+    // Update package.json
     const packageJsonPath = "./package.json";
     const packageJson = JSON.parse(await fs.readFile(packageJsonPath, "utf8"));
-    packageJson.devDependencies = {
-      ...packageJson.devDependencies,
-      jsdom: "^26.1.0",
-    };
+
+    packageJson.workspaces = ["playground"];
+    packageJson.scripts["playground"] = packageJson.scripts["play:terminal"].replace(
+      "--workspace=playground/terminal",
+      "--workspace=playground",
+    );
+
+    if (packageJson.scripts["play:browser"]) {
+      delete packageJson.scripts["play:browser"];
+    }
+    if (packageJson.scripts["play:terminal"]) {
+      delete packageJson.scripts["play:terminal"];
+    }
+    if (packageJson.devDependencies["jsdom"]) {
+      delete packageJson.devDependencies["jsdom"];
+    }
+
     await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, undefined, 2) + "\n", "utf8");
+
+    // Update README to remove browser references
+    const readmePath = "./README.md";
+    let readmeContent = await fs.readFile(readmePath, "utf8");
+    readmeContent = readmeContent.replace(/## Browser Support[\s\S]*?(?=##|$)/, "");
+    readmeContent = readmeContent.replaceAll(
+      /```javascript\s*\/\/ Browser environment[\s\S]*?```/g,
+      "",
+    );
+
+    await fs.writeFile(readmePath, readmeContent, "utf8");
   } catch (error) {
-    throw new Error(`Failed to configure browser support: ${error.message}`);
+    throw new Error(`Failed to remove browser support: ${error.message}`);
+  }
+}
+
+/**
+ * Remove node support
+ */
+async function removeNodeSupport() {
+  try {
+    // Simplify playground structure by moving browser playground to root
+    await fs.mkdir("./playground_temp", { recursive: true });
+    await fs.cp("./playground/browser", "./playground_temp", { recursive: true });
+    await fs.rm("./playground", { force: true, recursive: true });
+    await fs.rename("./playground_temp", "./playground");
+
+    // Simplify test structure by moving browser tests to root
+    await fs.mkdir("./test_temp", { recursive: true });
+    await fs.cp("./test/browser", "./test_temp", { recursive: true });
+    await fs.rm("./test", { force: true, recursive: true });
+    await fs.rename("./test_temp", "./test");
+
+    // Update vitest.config.ts
+    const vitestPath = "./vitest.config.ts";
+    let vitestContent = await fs.readFile(vitestPath, "utf8");
+    vitestContent = vitestContent.replace(/workspace: \[\s*\{[\s\S]*?\}\s*\],/, "");
+    await fs.writeFile(vitestPath, vitestContent, "utf8");
+
+    // Update tsup.config.ts
+    const tsupPath = "./tsup.config.ts";
+    let tsupContent = await fs.readFile(tsupPath, "utf8");
+    tsupContent = tsupContent.replace(/platform: "neutral"/, 'platform: "browser"');
+    await fs.writeFile(tsupPath, tsupContent, "utf8");
+
+    // Update package.json
+    const packageJsonPath = "./package.json";
+    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, "utf8"));
+
+    packageJson.workspaces = ["playground"];
+    packageJson.scripts["playground"] = packageJson.scripts["play:browser"].replace(
+      "--workspace=playground/browser",
+      "--workspace=playground",
+    );
+
+    if (packageJson.scripts["play:browser"]) {
+      delete packageJson.scripts["play:browser"];
+    }
+    if (packageJson.scripts["play:terminal"]) {
+      delete packageJson.scripts["play:terminal"];
+    }
+
+    await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, undefined, 2) + "\n", "utf8");
+
+    // Update README to remove node references
+    const readmePath = "./README.md";
+    let readmeContent = await fs.readFile(readmePath, "utf8");
+    readmeContent = readmeContent.replace(/## Node Support[\s\S]*?(?=##|$)/, "");
+    readmeContent = readmeContent.replaceAll(
+      /```javascript\s*\/\/ Node environment[\s\S]*?```/g,
+      "",
+    );
+
+    await fs.writeFile(readmePath, readmeContent, "utf8");
+  } catch (error) {
+    throw new Error(`Failed to remove node support: ${error.message}`);
   }
 }
 
